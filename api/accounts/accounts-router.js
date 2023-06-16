@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const Accounts = require('./accounts-model');
-const { checkAccountId, checkAccountNameUnique } = require('./accounts-middleware');
+const { checkAccountId, checkAccountNameUnique, checkAccountPayload } = require('./accounts-middleware');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -20,9 +20,17 @@ router.get('/:id', checkAccountId, async (req, res, next) => {
   }
 })
 
-router.post('/', checkAccountNameUnique, async (req, res, next) => {
+router.post('/', checkAccountPayload, checkAccountNameUnique, async (req, res, next) => {
+  const name = req.body.name.trim();
+  const budget = req.body.budget;
+
   try {
-    const newAccountId = await Accounts.create(req.body);
+
+    if (isNaN(parseInt(budget)) === true) {
+      res.status(400).json({message: "budget of account must be a number"})
+    }
+    
+    const newAccountId = await Accounts.create({name, budget});
     const pullNewAccount = await Accounts.getById(newAccountId);
     res.status(201).json(pullNewAccount)
   } catch (err) {
@@ -30,7 +38,7 @@ router.post('/', checkAccountNameUnique, async (req, res, next) => {
   }
 })
 
-router.put('/:id', checkAccountId, checkAccountNameUnique, async (req, res, next) => {
+router.put('/:id', checkAccountId, checkAccountPayload, checkAccountNameUnique, async (req, res, next) => {
   try {
     const updatedAccount = await Accounts.updateById(req.params.id, req.body);
     res.status(200).json(updatedAccount);
