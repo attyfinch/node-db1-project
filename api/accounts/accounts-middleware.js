@@ -4,7 +4,11 @@ exports.checkAccountPayload = async (req, res, next) => {
 
   const { name, budget } = req.body;
   try {
-    if (!name || !budget) {
+    // if (isNaN(parseInt(budget)) === true) {
+    //   res.status(400).json({message: "budget of account must be a number"})
+    // }
+    
+    if (!name || budget === undefined) {
       res.status(400).json({message: "name and budget are required"})
     } else if (name.trim().length > 100 || name.trim().length < 3) {
       res.status(400).json({message: "name of account must be between 3 and 100"})
@@ -18,7 +22,6 @@ exports.checkAccountPayload = async (req, res, next) => {
   } catch (err) {
     next(err)
   }
-  
 }
 
 exports.checkAccountNameUnique = async (req, res, next) => {
