@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const Accounts = require('./accounts-model');
+const { checkAccountId, checkAccountNameUnique } = require('./accounts-middleware');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -10,7 +11,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', checkAccountId, async (req, res, next) => {
   try {
     const account = await Accounts.getById(req.params.id);
     res.status(202).json(account);
@@ -19,7 +20,7 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', checkAccountNameUnique, async (req, res, next) => {
   try {
     const newAccountId = await Accounts.create(req.body);
     const pullNewAccount = await Accounts.getById(newAccountId);
@@ -29,7 +30,7 @@ router.post('/', async (req, res, next) => {
   }
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', checkAccountId, checkAccountNameUnique, async (req, res, next) => {
   try {
     const updatedAccount = await Accounts.updateById(req.params.id, req.body);
     res.status(200).json(updatedAccount);
@@ -38,7 +39,7 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', checkAccountId, async (req, res, next) => {
   try {
     const deletedAccount = await Accounts.deleteById(req.params.id);
     res.status(200).json(deletedAccount);
