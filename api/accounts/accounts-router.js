@@ -24,10 +24,6 @@ router.post('/', checkAccountPayload, checkAccountNameUnique, async (req, res, n
   const name = req.body.name.trim();
   const budget = req.body.budget;
 
-  if (isNaN(parseInt(budget)) === true) {
-    res.status(400).json({message: "budget of account must be a number"})
-  }
-
   try {
     const newAccountId = await Accounts.create({name, budget});
     const pullNewAccount = await Accounts.getById(newAccountId);

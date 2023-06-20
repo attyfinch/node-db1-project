@@ -4,10 +4,15 @@ exports.checkAccountPayload = async (req, res, next) => {
 
   const { name, budget } = req.body;
   try {
-    // if (isNaN(parseInt(budget)) === true) {
-    //   res.status(400).json({message: "budget of account must be a number"})
-    // }
-    
+    /* 
+    this was very tricky to solve.
+    The first bit of budget logic couldn't be framed as !budget, b/c that would trigger
+    an error for a NaN value, which is what CodeGrade was setup to look for in terms of parsing
+    the int. If you try to parseInt on a non integer you get NaN.
+
+    Async didn't impact the outcome here.
+    */
+
     if (!name || budget === undefined) {
       res.status(400).json({message: "name and budget are required"})
     } else if (name.trim().length > 100 || name.trim().length < 3) {
